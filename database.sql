@@ -459,6 +459,8 @@ CREATE TABLE `roles` (
   `commandSharecpAll` int(11) NOT NULL DEFAULT 0,
   `commandSongOwn` int(11) NOT NULL DEFAULT 1,
   `commandSongAll` int(11) NOT NULL DEFAULT 0,
+  `commandUpdateOwn` int(11) NOT NULL DEFAULT 1,
+  `commandUpdateAll` int(11) NOT NULL DEFAULT 0,
   `profilecommandDiscord` int(11) NOT NULL DEFAULT 1,
   `actionRateDemon` int(11) NOT NULL DEFAULT 0,
   `actionRateStars` int(11) NOT NULL DEFAULT 0,
