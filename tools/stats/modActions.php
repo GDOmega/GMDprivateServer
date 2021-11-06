@@ -85,11 +85,17 @@ foreach($result as &$action){
 		case 13:
 			$actionname = "Changed level description";
 			break;
+		case 14:
+			$actionname = "Dis/enabled LDM Button";
+			break;
 		case 15:
 			$actionname = "Un/banned a user";
 			break;
 		case 16:
 			$actionname = "Song ID change";
+			break;
+		case 42:
+			$actionname = "Level Update";
 			break;
 		default:
 			$actionname = $action["type"];
