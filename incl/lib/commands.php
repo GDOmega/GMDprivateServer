@@ -17,12 +17,19 @@ class Commands {
 		require_once "../lib/mainLib.php";
                 require_once "../lib/webhooks/webhook.php";
 				$gs = new mainLib();
+                $uname = $gs->getUserName($userID);
 		$commentarray = explode(' ', $comment);
 		$uploadDate = time();
 		//LEVELINFO
 		$query2 = $db->prepare("SELECT extID FROM levels WHERE levelID = :id");
 		$query2->execute([':id' => $levelID]);
 		$targetExtID = $query2->fetchColumn();
+
+		$queryNAME = $db->prepare("SELECT levelName, userName FROM levels WHERE levelID = :id");
+		$queryNAME->execute([':id' => $levelID]);
+		$res = $queryNAME->fetchAll();
+		$aLevelName = $res[0]["levelName"];
+		$aUserName = $res[0]["userName"];
 		//ADMIN COMMANDS
 		if(substr($comment,0,5) == '!rate' AND $gs->checkPermission($accountID, "commandRate")){
 			$starStars = $commentarray[2];
@@ -51,6 +58,18 @@ class Commands {
 				$query = $db->prepare("UPDATE levels SET starCoins=:starCoins WHERE levelID=:levelID");
 				$query->execute([':starCoins' => $starCoins, ':levelID' => $levelID]);
 			}
+                        if ($starFeatured) {
+			$featurestr = "Yes";
+			} else {
+			$featurestr = "No";
+			}
+                        if ($starCoins) {
+			$coinstr = "Yes";
+			} else {
+			$coinstr = "No";
+			}
+			PostToHook("Command - Rate", "$uname rated $aLevelName by $aUserName ($levelID).\nStars: $starStars\nDifficulty: $diffName\nCoins: $coinstr\nFeatured: $featurestr\nReason: $rateReason");
+
 			return true;
 		}
 		if(substr($comment,0,8) == '!feature' AND $gs->checkPermission($accountID, "commandFeature")){
@@ -58,6 +77,7 @@ class Commands {
 			$query->execute([':levelID' => $levelID]);
 			$query = $db->prepare("INSERT INTO modactions (type, value, value3, timestamp, account) VALUES ('2', :value, :levelID, :timestamp, :id)");
 			$query->execute([':value' => "1", ':timestamp' => $uploadDate, ':id' => $accountID, ':levelID' => $levelID]);
+                        PostToHook("Command - Feature", "$uname featured $aLevelName by $aUserName ($levelID).");
 			return true;
 		}
 		if(substr($comment,0,5) == '!epic' AND $gs->checkPermission($accountID, "commandEpic")){
@@ -65,6 +85,7 @@ class Commands {
 			$query->execute([':levelID' => $levelID]);
 			$query = $db->prepare("INSERT INTO modactions (type, value, value3, timestamp, account) VALUES ('4', :value, :levelID, :timestamp, :id)");
 			$query->execute([':value' => "1", ':timestamp' => $uploadDate, ':id' => $accountID, ':levelID' => $levelID]);
+                        PostToHook("Command - Feature", "$uname epic'd $aLevelName by $aUserName ($levelID).");
 			return true;
 		}
 		if(substr($comment,0,7) == '!unepic' AND $gs->checkPermission($accountID, "commandUnepic")){
@@ -72,6 +93,7 @@ class Commands {
 			$query->execute([':levelID' => $levelID]);
 			$query = $db->prepare("INSERT INTO modactions (type, value, value3, timestamp, account) VALUES ('4', :value, :levelID, :timestamp, :id)");
 			$query->execute([':value' => "0", ':timestamp' => $uploadDate, ':id' => $accountID, ':levelID' => $levelID]);
+		        PostToHook("Command - Feature", "$uname unepic'd $aLevelName by $aUserName ($levelID).");
 				return true;
 		}
 		if(substr($comment,0,12) == '!verifycoins' AND $gs->checkPermission($accountID, "commandVerifycoins")){
@@ -79,6 +101,7 @@ class Commands {
 			$query->execute([':levelID' => $levelID]);
 			$query = $db->prepare("INSERT INTO modactions (type, value, value3, timestamp, account) VALUES ('2', :value, :levelID, :timestamp, :id)");
 			$query->execute([':value' => "1", ':timestamp' => $uploadDate, ':id' => $accountID, ':levelID' => $levelID]);
+                        PostToHook("Command - Coins", "$uname verified coins for $aLevelName by $aUserName ($levelID).");
 			return true;
 		}
 		if(substr($comment,0,6) == '!daily' AND $gs->checkPermission($accountID, "commandDaily")){
@@ -98,6 +121,7 @@ class Commands {
 				$query->execute([':levelID' => $levelID, ':uploadDate' => $timestamp]);
 			$query = $db->prepare("INSERT INTO modactions (type, value, value3, timestamp, account, value2, value4) VALUES ('5', :value, :levelID, :timestamp, :id, :dailytime, 0)");
 			$query->execute([':value' => "1", ':timestamp' => $uploadDate, ':id' => $accountID, ':levelID' => $levelID, ':dailytime' => $timestamp]);
+                        PostToHook("Command - Daily", "$uname dailied $aLevelName by $aUserName ($levelID).");
 			return true;
 		}
 		if(substr($comment,0,7) == '!weekly' AND $gs->checkPermission($accountID, "commandWeekly")){
@@ -117,6 +141,7 @@ class Commands {
 			$query->execute([':levelID' => $levelID, ':uploadDate' => $timestamp]);
 			$query = $db->prepare("INSERT INTO modactions (type, value, value3, timestamp, account, value2, value4) VALUES ('5', :value, :levelID, :timestamp, :id, :dailytime, 1)");
 			$query->execute([':value' => "1", ':timestamp' => $uploadDate, ':id' => $accountID, ':levelID' => $levelID, ':dailytime' => $timestamp]);
+                        PostToHook("Command - Daily", "$uname weeklied $aLevelName by $aUserName ($levelID).");
 			return true;
 		}
 		if(substr($comment,0,6) == '!delet' AND $gs->checkPermission($accountID, "commandDelete")){
@@ -129,6 +154,7 @@ class Commands {
 			$query->execute([':value' => "1", ':timestamp' => $uploadDate, ':id' => $accountID, ':levelID' => $levelID]);
 			if(file_exists(dirname(__FILE__)."../../data/levels/$levelID")){
 				rename(dirname(__FILE__)."../../data/levels/$levelID",dirname(__FILE__)."../../data/levels/deleted/$levelID");
+                        PostToHook("Command - Delete", "$uname deleted $aLevelName by $aUserName (x-$levelID).", 0x800000);
 			}
 			return true;
 		}
@@ -147,6 +173,7 @@ class Commands {
 			$query->execute([':extID' => $targetAcc, ':userID' => $userID, ':userName' => $commentarray[1], ':levelID' => $levelID]);
 			$query = $db->prepare("INSERT INTO modactions (type, value, value3, timestamp, account) VALUES ('7', :value, :levelID, :timestamp, :id)");
 			$query->execute([':value' => $commentarray[1], ':timestamp' => $uploadDate, ':id' => $accountID, ':levelID' => $levelID]);
+                        PostToHook("Command - Move", "$uname moved $aLevelName to $targetAcc by $aUserName ($levelID).", 0xff4000);
 			return true;
 		}
 
@@ -158,6 +185,7 @@ class Commands {
 			$query->execute([':levelID' => $levelID, ':levelName' => $name]);
 			$query = $db->prepare("INSERT INTO modactions (type, value, timestamp, account, value3) VALUES ('8', :value, :timestamp, :id, :levelID)");
 			$query->execute([':value' => $name, ':timestamp' => $uploadDate, ':id' => $accountID, ':levelID' => $levelID]);
+                        PostToHook("Command - Move", "$uname renamed $levelID to $name by $aUserName.", 0xff4000);
 			return true;
 		}
 		if(self::ownCommand($comment, "pass", $accountID, $targetExtID)){
@@ -232,6 +260,13 @@ class Commands {
 			$query->execute([':levelID' => $levelID]);
 			$query = $db->prepare("INSERT INTO modactions (type, value, value3, timestamp, account) VALUES ('14', :value, :levelID, :timestamp, :id)");
 			$query->execute([':value' => "0", ':timestamp' => $uploadDate, ':id' => $accountID, ':levelID' => $levelID]);
+			return true;
+		}
+		if(self::ownCommand($comment, "update", $accountID, $targetExtID)){
+			$query = $db->prepare("UPDATE levels SET levelVersion='levelVersion + 1' WHERE levelID=:levelID");
+			$query->execute([':levelID' => $levelID]);
+			$query = $db->prepare("INSERT INTO modactions (type, value, value3, timestamp, account) VALUES ('42', :value, :levelID, :timestamp, :id)");
+			$query->execute([':value' => "+1", ':timestamp' => $uploadDate, ':id' => $accountID, ':levelID' => $levelID]);
 			return true;
 		}
 		return false;
