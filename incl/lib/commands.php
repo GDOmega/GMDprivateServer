@@ -36,9 +36,19 @@ class Commands {
 			if($starStars == ""){
 				$starStars = 0;
 			}
+                        $rateReason = $commentarray[4];
+				if ($rateReason == "")
+				{
+					$rateReason = "None";
+				}
+				else
+				{
+					$rateReason = "\"".$rateReason."\"";
+				}
 			$starCoins = $commentarray[3];
 			$starFeatured = $commentarray[4];
 			$diffArray = $gs->getDiffFromName($commentarray[1]);
+                        $diffName = $commentarray[1];
 			$starDemon = $diffArray[1];
 			$starAuto = $diffArray[2];
 			$starDifficulty = $diffArray[0];
