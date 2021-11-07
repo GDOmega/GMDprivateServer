@@ -17,7 +17,7 @@ class Commands {
 		require_once "../lib/mainLib.php";
                 require_once "../lib/webhooks/webhook.php";
 				$gs = new mainLib();
-                $uname = $gs->getUserName($userID);
+                $uname = $gs->getUserName($accountID);
 		$commentarray = explode(' ', $comment);
 		$uploadDate = time();
 		//LEVELINFO
@@ -36,7 +36,7 @@ class Commands {
 			if($starStars == ""){
 				$starStars = 0;
 			}
-                        $rateReason = $commentarray[4];
+                        $rateReason = $commentarray[5];
 				if ($rateReason == "")
 				{
 					$rateReason = "None";
@@ -78,7 +78,7 @@ class Commands {
 			} else {
 			$coinstr = "No";
 			}
-			PostToHook("Command - Rate", "$uname rated $aLevelName by $aUserName ($levelID).\nStars: $starStars\nDifficulty: $diffName\nCoins: $coinstr\nFeatured: $featurestr\nReason: $rateReason");
+			PostToHook("Command - Rate", "$uname rated $aLevelName by $aUserName ($levelID).\nStars: $starStars\nDifficulty: $diffName\nFeatured: $featurestr\nCoins: $coinstr\nReason: $rateReason");
 
 			return true;
 		}
@@ -273,7 +273,7 @@ class Commands {
 			return true;
 		}
 		if(self::ownCommand($comment, "update", $accountID, $targetExtID)){
-			$query = $db->prepare("UPDATE levels SET levelVersion='levelVersion + 1' WHERE levelID=:levelID");
+			$query = $db->prepare("UPDATE levels SET levelVersion=levelVersion + 1 WHERE levelID=:levelID");
 			$query->execute([':levelID' => $levelID]);
 			$query = $db->prepare("INSERT INTO modactions (type, value, value3, timestamp, account) VALUES ('42', :value, :levelID, :timestamp, :id)");
 			$query->execute([':value' => "+1", ':timestamp' => $uploadDate, ':id' => $accountID, ':levelID' => $levelID]);
