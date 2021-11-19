@@ -17,7 +17,7 @@ class Commands {
 		require_once "../lib/mainLib.php";
                 require_once "../lib/webhooks/webhook.php";
 				$gs = new mainLib();
-                $uname = $gs->getUserName($accountID);
+                $uname = $gs->getAccountName($accountID);
 		$commentarray = explode(' ', $comment);
 		$uploadDate = time();
 		//LEVELINFO
