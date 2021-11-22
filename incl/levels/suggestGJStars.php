@@ -32,17 +32,17 @@ if($gs->checkPermission($accountID, "actionRateStars")){
 	}
         if ($difficulty == 10) {
         $diff2 = "Easy";
-        elseif ($difficulty == 20) {
+	} elseif ($difficulty == 20) {
         $diff2 = "Normal";
-        elseif ($difficulty == 30) {
+	} elseif ($difficulty == 30) {
         $diff2 = "Hard";
-        elseif ($difficulty == 40) {
+	} elseif ($difficulty == 40) {
         $diff2 = "Harder";
-        elseif ($difficulty == 50) {
+	} elseif ($difficulty == 50) {
         $diff2 = "Insane";
-        elseif ($difficulty == 50) and ($stars == 1)  {
+	} elseif ($difficulty == 50) and ($stars == 1)  {
         $diff2 = "Auto";
-        elseif ($difficulty == 50) and ($stars >= 10)  {
+	} elseif ($difficulty == 50) and ($stars >= 10)  {
         $diff2 = "Demon";
 	}
         PostToHook("Command - Rate", "$uname rated $aLevelName by $aUserName ($levelID).\nStars: $stars\nDifficulty: $diff2\nFeatured: $featurestr\nCoins: Yes");
