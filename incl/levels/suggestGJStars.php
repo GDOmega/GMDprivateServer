@@ -8,6 +8,8 @@ require_once "../lib/mainLib.php";
 require_once "../lib/webhooks/webhook.php";
 $gs = new mainLib();
 $uname = $gs->getAccountName($accountID);
+$queryNAME = $db->prepare("SELECT levelName, userName FROM levels WHERE levelID = :id");
+$queryNAME->execute([':id' => $levelID]);
 $res = $queryNAME->fetchAll();
 $aLevelName = $res[0]["levelName"];
 $aUserName = $res[0]["userName"];
