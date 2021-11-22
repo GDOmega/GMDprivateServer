@@ -18,7 +18,7 @@ class Commands {
                 require_once "../lib/webhooks/webhook.php";
 				$gs = new mainLib();
                 $uname = $gs->getAccountName($accountID);
-		$commentarray = explode(' ', $comment);
+		$commentarray = explode(' ', $comment, 5);
 		$uploadDate = time();
 		//LEVELINFO
 		$query2 = $db->prepare("SELECT extID FROM levels WHERE levelID = :id");
